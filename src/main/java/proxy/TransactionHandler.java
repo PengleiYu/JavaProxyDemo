@@ -1,7 +1,5 @@
 package proxy;
 
-import proxy.InvocationHandler2;
-
 import java.lang.reflect.Method;
 
 public class TransactionHandler implements InvocationHandler2 {

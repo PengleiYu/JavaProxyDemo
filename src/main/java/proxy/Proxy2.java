@@ -10,6 +10,9 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+/**
+ * 模拟动态代理
+ */
 public class Proxy2 {
     public static void main(String[] args) throws Exception {
         UserMgr mgr = new UserMgrImpl();
@@ -25,16 +28,14 @@ public class Proxy2 {
         u.addUser();
         System.out.println("\r\n==========华丽的分割线==========\r\n");
         u.delUser();
-
     }
 
     /**
      * @param infce 被代理类的接口
      * @param h     代理类
-     * @return
      * @throws Exception
      */
-    public static Object newProxyInstance(Class infce, InvocationHandler2 h) throws Exception {
+    private static Object newProxyInstance(Class infce, InvocationHandler2 h) throws Exception {
         String methodStr = "";
         String rt = "\r\n";
 
@@ -51,28 +52,33 @@ public class Proxy2 {
         }
 
         //生成Java源文件
+//        String packageName = Proxy2.class.getPackage().getName();
+//        System.out.println("packageName = " + packageName);
+        String proxyName = getProxyName();
         String srcCode =
 //                "package com.tgb.proxy;" + rt +
+//                "package " + packageName + ";" + rt +
                 "import java.lang.reflect.Method;" + rt +
-                        "public class $Proxy1 implements " + infce.getName() + "{" + rt +
-                        "    public $Proxy1(proxy.InvocationHandler2 h) {" + rt +
+                        "public class " + proxyName + " implements " + infce.getName() + "{" + rt +
+                        "    public " + proxyName + "(proxy.InvocationHandler2 h) {" + rt +
                         "        this.h = h;" + rt +
                         "    }" + rt +
 //                        "    com.tgb.proxy.proxy.InvocationHandler2 h;" + rt +
                         "    proxy.InvocationHandler2 h;" + rt +
                         methodStr + rt +
                         "}";
-        String packageName = Proxy2.class.getPackage().getName();
-        System.out.println(packageName);
-        String path=new File("").getAbsolutePath()+"/src";
-        String fileName = path+ "/main/java/"+packageName+"/$Proxy1.java";
+        String path = new File("").getAbsolutePath() + "/src";
+//        String prefix = path + "/main/java/" + packageName;
+        String prefix = path + "/main/java/";
+        String fileName = prefix + "/" + proxyName + ".java";
 //                "d:/src/com/tgb/proxy/$Proxy1.java";
-        File f = new File(fileName);
-        FileWriter fw = new FileWriter(f);
+        new File(fileName).delete();
+        new File(prefix + "/" + proxyName + ".class").delete();
+
+        FileWriter fw = new FileWriter(fileName);
         fw.write(srcCode);
         fw.flush();
         fw.close();
-
         //将Java文件编译成class文件
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager fileMgr = compiler.getStandardFileManager(null, null, null);
@@ -86,11 +92,15 @@ public class Proxy2 {
         URL[] urls = new URL[]{new URL("file:/" + path)};
         URLClassLoader ul = new URLClassLoader(urls);
 //        Class c = ul.loadClass("com.tgb.proxy.$Proxy1");
-        Class c = ul.loadClass("$Proxy1");
+        Class c = ul.loadClass(proxyName + "");//这里不知道为什么找不到类
 
         Constructor ctr = c.getConstructor(InvocationHandler2.class);
-        Object m = ctr.newInstance(h);
-
-        return m;
+        return ctr.newInstance(h);
     }
+
+    private static String getProxyName() {
+        return "$Proxy" + (sNum++);
+    }
+
+    private static int sNum = 0;
 }
