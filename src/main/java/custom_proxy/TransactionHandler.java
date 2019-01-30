@@ -1,4 +1,4 @@
-package proxy;
+package custom_proxy;
 
 import java.lang.reflect.Method;
 

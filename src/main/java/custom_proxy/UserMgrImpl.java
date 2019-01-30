@@ -1,6 +1,4 @@
-package proxy;
-
-import proxy.UserMgr;
+package custom_proxy;
 
 public  class UserMgrImpl implements UserMgr {
 

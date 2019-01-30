@@ -1,4 +1,4 @@
-package proxy;
+package custom_proxy;
 
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
@@ -52,7 +52,7 @@ public class Proxy2 {
         }
 
         //生成Java源文件
-//        String packageName = Proxy2.class.getPackage().getName();
+        String packageName = Proxy2.class.getPackage().getName();
 //        System.out.println("packageName = " + packageName);
         String proxyName = getProxyName();
         String srcCode =
@@ -60,11 +60,11 @@ public class Proxy2 {
 //                "package " + packageName + ";" + rt +
                 "import java.lang.reflect.Method;" + rt +
                         "public class " + proxyName + " implements " + infce.getName() + "{" + rt +
-                        "    public " + proxyName + "(proxy.InvocationHandler2 h) {" + rt +
+                        "    public " + proxyName + "(" + packageName + ".InvocationHandler2 h) {" + rt +
                         "        this.h = h;" + rt +
                         "    }" + rt +
-//                        "    com.tgb.proxy.proxy.InvocationHandler2 h;" + rt +
-                        "    proxy.InvocationHandler2 h;" + rt +
+//                        "    com.tgb.proxy.custom_proxy.InvocationHandler2 h;" + rt +
+                        "    " + packageName + ".InvocationHandler2 h;" + rt +
                         methodStr + rt +
                         "}";
         String path = new File("").getAbsolutePath() + "/src";
